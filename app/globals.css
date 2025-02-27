@@ -81,3 +81,22 @@
 .retro-text {
   font-family: 'VT323', monospace;
 }
+
+@keyframes shutter {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shutter-effect {
+  animation: shutter 200ms ease-out forwards;
+}

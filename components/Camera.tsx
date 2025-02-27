@@ -19,6 +19,7 @@ export function Camera() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedFilter, setSelectedFilter] = useState(FILTERS[0]);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [showShutter, setShowShutter] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [countdownText, setCountdownText] = useState("");
 
@@ -38,7 +39,12 @@ export function Camera() {
     setupCamera();
   }, []);
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
+    // Trigger shutter effect
+    setShowShutter(true);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    setShowShutter(false);
+
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       if (context) {
@@ -118,6 +124,7 @@ export function Camera() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="relative rounded-xl overflow-hidden bg-zinc-900 p-4">
+        {/* Camera */}
         <div className="aspect-video relative rounded-lg overflow-hidden">
           <video
             ref={videoRef}
@@ -140,9 +147,12 @@ export function Camera() {
                 </span>
               </motion.div>
             )}
+            {showShutter && (
+              <div className="absolute inset-0 bg-black shutter-effect" />
+            )}
           </AnimatePresence>
         </div>
-
+        {/* Filters */}
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
           {FILTERS.map((filter) => (
             <button
@@ -160,6 +170,7 @@ export function Camera() {
           ))}
         </div>
 
+        {/* Photo Buttons */}
         <div className="mt-4 flex justify-center gap-4">
           <motion.button
             onClick={startPhotoSequence}
@@ -175,28 +186,36 @@ export function Camera() {
         </div>
       </div>
 
+      {/* Take photos */}
       {photos.length > 0 && (
-        <div className="mt-8 relative bg-white p-4 rounded-xl" id="photo-strip">
-          <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-4">
+        <div className="mt-8 relative bg-white p-4 " id="photo-strip">
+          {/* Complete Photo Strip - Photo and WaterMark */}
+          <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-4 mb-[7rem] mt-1">
             {/* Photo Section */}
             <div className="space-y-2">
               {photos.map((photo, index) => (
-                <div key={index} className="rounded-lg overflow-hidden">
+                <div key={index} className="overflow-hidden ">
                   <img
                     src={photo}
                     alt={`Photo ${index + 1}`}
-                    className={`w-full h-auto md:w-auto ${selectedFilter.class}`}
+                    className={`w-full h-auto md:w-auto border border-black ${selectedFilter.class}`}
                   />
                 </div>
               ))}
             </div>
 
             {/* Right Section with Text and Logos */}
-            <div className="flex flex-col items-center justify-between p-4 bg-gray-100 rounded-lg">
-              <div className="writing-mode-vertical-rl transform rotate-180 retro-title text-lg md:text-xl">
-                HACKNIGHT&apos;25
+
+            <div className="flex flex-col items-center justify-between p-4 bg-gray-100 rounded-lg w-full h-full">
+              {/* Rotated Text (Covers 60% Height) */}
+              <div className="flex flex-col items-center justify-center h-[60%]">
+                <span className="text-black text-lg md:text-2xl font-bold tracking-wide transform rotate-90">
+                  HACKNIGHT'25
+                </span>
               </div>
-              <div className="space-y-4">
+
+              {/* Logos & Timestamp */}
+              <div className="flex flex-col items-center justify-end space-y-4 h-[40%]">
                 <Image
                   src="/hc1.png"
                   width={64}
@@ -215,7 +234,7 @@ export function Camera() {
                   priority
                   unoptimized
                 />
-                <div className="mt-4 text-center text-black retro-text text-sm md:text-lg">
+                <div className="text-black text-sm md:text-lg font-semibold">
                   {new Date().toLocaleString()} • HK25
                 </div>
               </div>
