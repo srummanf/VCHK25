@@ -127,7 +127,7 @@ export function Camera() {
     <div className="max-w-4xl mx-auto">
       <div className="relative rounded-xl overflow-hidden bg-zinc-900 p-4">
         {/* Camera */}
-        <div className="aspect-video relative rounded-lg w-fullh-[60vh] md:h-auto overflow-hidden">
+        <div className="aspect-video relative rounded-lg w-full h-[60vh] overflow-hidden">
           <video
             ref={videoRef}
             autoPlay
