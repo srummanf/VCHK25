@@ -208,7 +208,7 @@ export function Camera() {
                       <img
                         src={photo}
                         alt={`Photo ${index + 1}`}
-                        className={`w-full h-auto md:w-auto border  ${selectedFilter.class}`}
+                        className={`w-full h-[40vh] md:w-auto border  ${selectedFilter.class}`}
                       />
                     </div>
                   ))}
