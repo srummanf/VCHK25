@@ -17,11 +17,13 @@ const FILTERS = [
 export function Camera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const photoStripRef = useRef<HTMLDivElement>(null);
   const [selectedFilter, setSelectedFilter] = useState(FILTERS[0]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [showShutter, setShowShutter] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [countdownText, setCountdownText] = useState("");
+  const [isPhotoEmerging, setIsPhotoEmerging] = useState(false);
 
   useEffect(() => {
     async function setupCamera() {
@@ -59,7 +61,7 @@ export function Camera() {
     setIsCapturing(true);
     setPhotos([]);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 1; i++) {
       // Countdown sequence
       for (let count = 3; count > 0; count--) {
         setCountdownText(count.toString());
@@ -125,7 +127,7 @@ export function Camera() {
     <div className="max-w-4xl mx-auto">
       <div className="relative rounded-xl overflow-hidden bg-zinc-900 p-4">
         {/* Camera */}
-        <div className="aspect-video relative rounded-lg overflow-hidden">
+        <div className="aspect-video relative rounded-lg w-fullh-[60vh] md:h-auto overflow-hidden">
           <video
             ref={videoRef}
             autoPlay
@@ -186,95 +188,115 @@ export function Camera() {
         </div>
       </div>
 
+      {/* Photo Slot */}
+      {/* <div className="w-full max-w-md h-8 bg-gray-300 mt-4 shadow-inner flex justify-center items-center ml-[14rem]">
+        <div className="w-[90%] h-1 bg-gray-500 rounded-full"></div>
+      </div> */}
+
       {/* Take photos */}
-      {photos.length > 0 && (
-        <div className="mt-8 relative bg-white p-4 " id="photo-strip">
-          {/* Complete Photo Strip - Photo and WaterMark */}
-          <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-4 mb-[7rem] mt-1">
-            {/* Photo Section */}
-            <div className="space-y-2">
-              {photos.map((photo, index) => (
-                <div key={index} className="overflow-hidden ">
-                  <img
-                    src={photo}
-                    alt={`Photo ${index + 1}`}
-                    className={`w-full h-auto md:w-auto border border-black ${selectedFilter.class}`}
-                  />
+
+      <AnimatePresence>
+        {photos.length > 0 && (
+          <div className="mt-8 relative  p-4" id="photo-strip">
+            {/* Complete Photo Strip - Photo and WaterMark */}
+            <div className="max-w-md mx-auto bg-[#e8e6e1] p-4 mb-[9rem]">
+              <div className="aspect-[1/1.5] flex flex-col">
+                {/* Photo Section */}
+                <div className="space-y-2">
+                  {photos.map((photo, index) => (
+                    <div key={index} className="overflow-hidden ">
+                      <img
+                        src={photo}
+                        alt={`Photo ${index + 1}`}
+                        className={`w-full h-auto md:w-auto border  ${selectedFilter.class}`}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {/* Title Section */}
+                <div className="font-bold text-black">
+                  <h1 className="text-5xl tracking-tight leading-none">fvd</h1>
+                  <h2 className="text-2xl">gfb</h2>
+                </div>
+
+                {/* Details Section */}
+                <div className="mt-4 space-y-2 text-sm text-black">
+                  <div className="flex">
+                    <span className="w-24 text-left">running time</span>
+                    <span className="flex-1">bsdf MINUTES</span>
+                  </div>
+
+                  <div className="flex items-start">
+                    <span className="w-24 text-left">directed by</span>
+                    <span className="flex-1">frgver + </span>
+                  </div>
+
+                  <div className="flex items-start">
+                    <span className="w-24 text-left">produced by</span>
+                    <span className="flex-1">frgver + </span>
+                  </div>
+
+                  <div className="flex items-start mb-9">
+                    <span className="w-24 text-left">starring</span>
+                    <span className="flex-1">frgver + </span>
+                  </div>
+
+                  <div className="flex items-end mb-9">
+                    <span className="w-24 text-left">starring</span>
+                    <span className="flex-1">frgvedewefr + </span>
+                    <Image
+                      src="/hc1.png"
+                      width={64}
+                      height={64}
+                      alt="Logo 1"
+                      className="w-12 h-12 md:w-16 md:h-16"
+                      priority
+                      unoptimized
+                    ></Image>
+                    <span className="flex-1">
+                      {new Date().toLocaleString()} • HK25
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Right Section with Text and Logos */}
+            {/* Buttons (Hidden in Download) */}
+            <div className="mt-4 flex justify-center gap-4 photo-buttons">
+              <motion.button
+                onClick={downloadPhotos}
+                className="bg-yellow-400 text-black px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Download className="w-4 h-4 md:w-5 md:h-5" />
+                Save Photos
+              </motion.button>
 
-            <div className="flex flex-col items-center justify-between p-4 bg-gray-100 rounded-lg w-full h-full">
-              {/* Rotated Text (Covers 60% Height) */}
-              <div className="flex flex-col items-center justify-center h-[60%]">
-                <span className="text-black text-lg md:text-2xl font-bold tracking-wide transform rotate-90">
-                  HACKNIGHT'25
-                </span>
-              </div>
+              <motion.button
+                onClick={discardPhotos}
+                className="bg-red-500 text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <X className="w-4 h-4 md:w-5 md:h-5" />
+                Discard
+              </motion.button>
 
-              {/* Logos & Timestamp */}
-              <div className="flex flex-col items-center justify-end space-y-4 h-[40%]">
-                <Image
-                  src="/hc1.png"
-                  width={64}
-                  height={64}
-                  alt="Logo 1"
-                  className="w-12 h-12 md:w-16 md:h-16"
-                  priority
-                  unoptimized
-                />
-                <Image
-                  src="/hc2.png"
-                  width={64}
-                  height={64}
-                  alt="Logo 2"
-                  className="w-12 h-12 md:w-16 md:h-16"
-                  priority
-                  unoptimized
-                />
-                <div className="text-black text-sm md:text-lg font-semibold">
-                  {new Date().toLocaleString()} • HK25
-                </div>
-              </div>
+              <motion.button
+                onClick={() => setPhotos([])}
+                className="bg-zinc-800 text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <RefreshCw className="w-4 h-4 md:w-5 md:h-5" />
+                Retake
+              </motion.button>
             </div>
           </div>
-
-          {/* Buttons (Hidden in Download) */}
-          <div className="mt-4 flex justify-center gap-4 photo-buttons">
-            <motion.button
-              onClick={downloadPhotos}
-              className="bg-yellow-400 text-black px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Download className="w-4 h-4 md:w-5 md:h-5" />
-              Save Photos
-            </motion.button>
-
-            <motion.button
-              onClick={discardPhotos}
-              className="bg-red-500 text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <X className="w-4 h-4 md:w-5 md:h-5" />
-              Discard
-            </motion.button>
-
-            <motion.button
-              onClick={() => setPhotos([])}
-              className="bg-zinc-800 text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-bold flex items-center gap-2 retro-text text-sm md:text-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <RefreshCw className="w-4 h-4 md:w-5 md:h-5" />
-              Retake
-            </motion.button>
-          </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }
